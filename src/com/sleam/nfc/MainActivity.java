@@ -51,7 +51,12 @@ public class MainActivity extends Activity {
         else {
         	mTextView.setText(R.string.explanation);
         }
-        handleIntent(getIntent());
+        try {
+			handleIntent(getIntent());
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
     }
 
@@ -70,15 +75,34 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onNewIntent(Intent intent){
-    	handleIntent(intent);
+    	try {
+			handleIntent(intent);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
-    private void handleIntent(Intent intent){
+    public String bin2hex(String s) throws UnsupportedEncodingException{
+		byte[] bytes = s.getBytes("utf-8");
+		char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+		char[] chars = new char[bytes.length*2];
+		for(int i = 0; i < bytes.length; i++) {
+		  chars[2*i] = hexDigits[(bytes[i] >> 4) & 0xF];
+		  chars[2*i+1] = hexDigits[bytes[i] & 0xF];
+		}
+		String hex = new String(chars);
+		return hex;
+	}
+    
+    private void handleIntent(Intent intent) throws UnsupportedEncodingException{
     	String action  = intent.getAction();
     	if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)){
     		String type = intent.getType();
     		if (MIME_TEXT_PLAIN.equals(type)){
     			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    	    	String nFCID = tag.getId().toString();   
+    	    	Toast.makeText(getApplicationContext(), "NFC id is: "+ bin2hex(nFCID), Toast.LENGTH_SHORT).show(); 
     			new NdefReaderTask().execute(tag);
                 
             } else {
