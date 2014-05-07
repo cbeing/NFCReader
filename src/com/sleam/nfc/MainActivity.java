@@ -2,6 +2,12 @@ package com.sleam.nfc;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -83,6 +89,10 @@ public class MainActivity extends Activity {
 		}
     }
     
+    
+    
+    
+    
     public String bin2hex(String s) throws UnsupportedEncodingException{
 		byte[] bytes = s.getBytes("utf-8");
 		char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -98,11 +108,40 @@ public class MainActivity extends Activity {
     private void handleIntent(Intent intent) throws UnsupportedEncodingException{
     	String action  = intent.getAction();
     	if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)){
+    		Log.i("Discovery", "Tag Discovered !");
     		String type = intent.getType();
     		if (MIME_TEXT_PLAIN.equals(type)){
     			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-    	    	String nFCID = tag.getId().toString();   
-    	    	Toast.makeText(getApplicationContext(), "NFC id is: "+ bin2hex(nFCID), Toast.LENGTH_SHORT).show(); 
+    	    	String nFCID = tag.getId().toString();
+    	    	
+    	    	Date dt = new Date();
+    	    	int hours = dt.getHours();
+    	    	int minutes = dt.getMinutes();
+    	    	int seconds = dt.getSeconds();
+
+    	    	String cTime = hours+":"+minutes+":"+seconds+"";
+    	    	String id = bin2hex(nFCID);
+    	    	JSONObject rootObj = new JSONObject();
+    	    	
+    	    	JSONArray etudiants = new JSONArray();
+    	    	
+    	    	JSONObject entree = new JSONObject();
+    	    	try {
+					entree.put("id", id.toString());
+					entree.put("time", dt.toString());
+					rootObj.put("etudiants", etudiants);
+					etudiants.put(entree);
+					Log.d("Readed ! ","############################################################");
+					
+					Log.d("JSON : " , rootObj.toString());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					Log.d("JSON : ","Erreur JSON");
+				}
+
+    	
+    	    	
+    	    	Toast.makeText(getApplicationContext(), "NFC NDEF id is: "+ bin2hex(nFCID)+"\n at : "+cTime, Toast.LENGTH_SHORT).show(); 
     			new NdefReaderTask().execute(tag);
                 
             } else {
@@ -117,11 +156,40 @@ public class MainActivity extends Activity {
              
             for (String tech : techList) {
                 if (searchedTech.equals(tech)) {
+                	String nFCID = tag.getId().toString();  
+        	    	Date dt = new Date();
+        	    	int hours = dt.getHours();
+        	    	int minutes = dt.getMinutes();
+        	    	int seconds = dt.getSeconds();
+        	    	String cTime = hours+":"+minutes+":"+seconds+"";
+        	    	        	    	
+        	    	
+        
+        	    	
+        	    	
+        	    	
+        	    	Toast.makeText(getApplicationContext(), "NFC TECH id is: "+ bin2hex(nFCID)+"\n at : "+cTime, Toast.LENGTH_SHORT).show(); 
                     new NdefReaderTask().execute(tag);
                     break;
                 }
             }
-        }
+        } else if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
+        	String type = intent.getType();
+    		if (MIME_TEXT_PLAIN.equals(type)){
+    			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    	    	String nFCID = tag.getId().toString();  
+    	    	Date dt = new Date();
+    	    	int hours = dt.getHours();
+    	    	int minutes = dt.getMinutes();
+    	    	int seconds = dt.getSeconds();
+    	    	String cTime = hours+":"+minutes+":"+seconds+"";
+    	    	
+    	    	Toast.makeText(getApplicationContext(), "NFC TAG id is: "+ bin2hex(nFCID)+"\n at : "+cTime, Toast.LENGTH_SHORT).show(); 
+    			new NdefReaderTask().execute(tag);
+    		 } else {
+                 Log.d(TAG, "Wrong mime type: " + type);
+             }
+        } 
     }
     
     public static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter){
@@ -186,6 +254,9 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String result) {
             if (result != null) {
                 mTextView.setText("Read content: " + result);
+            }
+            else {
+            	mTextView.setText("ERRRRRRRRR");
             }
     	}
     }
