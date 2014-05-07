@@ -1,9 +1,12 @@
 package com.sleam.nfc;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +19,11 @@ import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.nfc.NdefMessage;
@@ -36,12 +43,57 @@ public class MainActivity extends Activity {
 	public static final String TAG = "Nfc";
 	private TextView mTextView;
 	private NfcAdapter mNfcAdapter;
+	//JSONArray etudiants;
+	JSONObject rootObj;
+
+	private Button button01;
+    private TextView textView01;
+	private ArrayList<JSONObject> etudiants;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        button01 = (Button)findViewById(R.id.button1);
+        textView01 = (TextView)findViewById(R.id.textView1);
+        
+        etudiants = new ArrayList<JSONObject>();
+	    rootObj = new JSONObject();
+	    button01.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				JSONArray et = new JSONArray();
+				Iterator it = etudiants.iterator();
+				while(it.hasNext()) {
+					et.put(it.next());
+				}
+				
+				etudiants.clear();
+				
+				try {
+					Log.d("LENGTH", "AVANT : " + rootObj.length());
+					if(rootObj.length() == 1) {
+						Log.d("REMOVE", "obj etudiant removed");
+						rootObj.remove("etudiants");
+					}
+					
+					rootObj.put("etudiants", et);
+					textView01.setText(rootObj.toString());
+					Log.d("LENGTH", "APRES : " + rootObj.length());
+					
+					
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        
+			}
+		});
+	    
+
+	    
         mTextView = (TextView) findViewById(R.id.textView_explanation);
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         
@@ -88,22 +140,7 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
     }
-    
-    
-    
-    
-    
-    public String bin2hex(String s) throws UnsupportedEncodingException{
-		byte[] bytes = s.getBytes("utf-8");
-		char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-		char[] chars = new char[bytes.length*2];
-		for(int i = 0; i < bytes.length; i++) {
-		  chars[2*i] = hexDigits[(bytes[i] >> 4) & 0xF];
-		  chars[2*i+1] = hexDigits[bytes[i] & 0xF];
-		}
-		String hex = new String(chars);
-		return hex;
-	}
+
     
     private void handleIntent(Intent intent) throws UnsupportedEncodingException{
     	String action  = intent.getAction();
@@ -114,36 +151,7 @@ public class MainActivity extends Activity {
     			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
     	    	String nFCID = tag.getId().toString();
     	    	
-    	    	Date dt = new Date();
-    	    	int hours = dt.getHours();
-    	    	int minutes = dt.getMinutes();
-    	    	int seconds = dt.getSeconds();
-
-    	    	String cTime = hours+":"+minutes+":"+seconds+"";
-    	    	String id = bin2hex(nFCID);
-    	    	JSONObject rootObj = new JSONObject();
-    	    	
-    	    	JSONArray etudiants = new JSONArray();
-    	    	
-    	    	JSONObject entree = new JSONObject();
-    	    	try {
-					entree.put("id", id.toString());
-					entree.put("time", dt.toString());
-					rootObj.put("etudiants", etudiants);
-					etudiants.put(entree);
-					Log.d("Readed ! ","############################################################");
-					
-					Log.d("JSON : " , rootObj.toString());
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					Log.d("JSON : ","Erreur JSON");
-				}
-
-    	
-    	    	
-    	    	Toast.makeText(getApplicationContext(), "NFC NDEF id is: "+ bin2hex(nFCID)+"\n at : "+cTime, Toast.LENGTH_SHORT).show(); 
-    			new NdefReaderTask().execute(tag);
-                
+    	    	new NdefReaderTask().execute(tag);
             } else {
                 Log.d(TAG, "Wrong mime type: " + type);
             }
@@ -156,19 +164,7 @@ public class MainActivity extends Activity {
              
             for (String tech : techList) {
                 if (searchedTech.equals(tech)) {
-                	String nFCID = tag.getId().toString();  
-        	    	Date dt = new Date();
-        	    	int hours = dt.getHours();
-        	    	int minutes = dt.getMinutes();
-        	    	int seconds = dt.getSeconds();
-        	    	String cTime = hours+":"+minutes+":"+seconds+"";
-        	    	        	    	
-        	    	
-        
-        	    	
-        	    	
-        	    	
-        	    	Toast.makeText(getApplicationContext(), "NFC TECH id is: "+ bin2hex(nFCID)+"\n at : "+cTime, Toast.LENGTH_SHORT).show(); 
+                   	Toast.makeText(getApplicationContext(), "NFC TECH ", Toast.LENGTH_SHORT).show(); 
                     new NdefReaderTask().execute(tag);
                     break;
                 }
@@ -177,14 +173,8 @@ public class MainActivity extends Activity {
         	String type = intent.getType();
     		if (MIME_TEXT_PLAIN.equals(type)){
     			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-    	    	String nFCID = tag.getId().toString();  
-    	    	Date dt = new Date();
-    	    	int hours = dt.getHours();
-    	    	int minutes = dt.getMinutes();
-    	    	int seconds = dt.getSeconds();
-    	    	String cTime = hours+":"+minutes+":"+seconds+"";
     	    	
-    	    	Toast.makeText(getApplicationContext(), "NFC TAG id is: "+ bin2hex(nFCID)+"\n at : "+cTime, Toast.LENGTH_SHORT).show(); 
+    	    	Toast.makeText(getApplicationContext(), "NFC TAG ", Toast.LENGTH_SHORT).show(); 
     			new NdefReaderTask().execute(tag);
     		 } else {
                  Log.d(TAG, "Wrong mime type: " + type);
@@ -223,7 +213,7 @@ public class MainActivity extends Activity {
     		
     		Ndef ndef = Ndef.get(tag);
     		if (ndef == null){
-    			return null; // Ndef ne supporte ce tag
+    			return null; // Ndef ne supporte pas ce tag
     		}
     		NdefMessage ndefMessage = ndef.getCachedNdefMessage();
     		 
@@ -254,9 +244,30 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String result) {
             if (result != null) {
                 mTextView.setText("Read content: " + result);
+       	    	Date dt = new Date();
+    	    	int hours = dt.getHours();
+    	    	int minutes = dt.getMinutes();
+    	    	int seconds = dt.getSeconds();
+
+    	    	String cTime = hours+":"+minutes+":"+seconds+"";
+
+    	    	//JSON    	    	
+    	    	JSONObject entree = new JSONObject();
+    	    	try {
+					entree.put("data", result);
+					entree.put("time", dt.toString());
+					etudiants.add(entree);
+
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					Log.d("JSON : ","Erreur JSON");
+				}
+    			//FIN JSON
+    	    	
+    	    	Toast.makeText(getApplicationContext(), "Tag Contains " + result +"\n NFC NDEF "+"\n At : "+cTime, Toast.LENGTH_SHORT).show(); 
             }
             else {
-            	mTextView.setText("ERRRRRRRRR");
+            	mTextView.setText("VIDE");
             }
     	}
     }
