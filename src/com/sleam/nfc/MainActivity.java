@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -65,7 +66,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				JSONArray et = new JSONArray();
-				Iterator it = etudiants.iterator();
+				Iterator<JSONObject> it = etudiants.iterator();
 				while(it.hasNext()) {
 					et.put(it.next());
 				}
@@ -73,21 +74,21 @@ public class MainActivity extends Activity {
 				etudiants.clear();
 				
 				try {
-					Log.d("LENGTH", "AVANT : " + rootObj.length());
 					if(rootObj.length() == 1) {
-						Log.d("REMOVE", "obj etudiant removed");
 						rootObj.remove("etudiants");
 					}
-					
+				
 					rootObj.put("etudiants", et);
-					textView01.setText(rootObj.toString());
-					Log.d("LENGTH", "APRES : " + rootObj.length());
-					
+
 					
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				SendDataTask task = new SendDataTask();
+				task.execute(new JSONObject[] {rootObj});
+				Log.d("#############", "OKKKKK");
 		        
 			}
 		});
@@ -206,6 +207,26 @@ public class MainActivity extends Activity {
     public static void stopForegroundDispatch(final Activity activity, NfcAdapter adapter){
     	adapter.disableForegroundDispatch(activity);
     }
+    
+    
+	private class SendDataTask extends AsyncTask<JSONObject, Void, String> {
+
+		@Override
+		protected String doInBackground(JSONObject... params) {
+			HttpClient client = new HttpClient();
+			String result = client.postJsonData(params[0].toString());
+			return result;
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {			
+			super.onPostExecute(result);
+			((TextView) MainActivity.this.findViewById(R.id.textView1)).setText(result);
+		}
+
+	}
+    
+    
     private class NdefReaderTask extends AsyncTask<Tag, Void, String> {
     	@Override
     	protected String doInBackground(Tag... params){
