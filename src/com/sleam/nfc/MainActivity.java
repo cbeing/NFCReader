@@ -44,7 +44,6 @@ public class MainActivity extends Activity {
 	public static final String TAG = "Nfc";
 	private TextView mTextView;
 	private NfcAdapter mNfcAdapter;
-	//JSONArray etudiants;
 	JSONObject rootObj;
 
 	private Button button01;
@@ -265,18 +264,29 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String result) {
             if (result != null) {
                 mTextView.setText("Read content: " + result);
-       	    	Date dt = new Date();
-    	    	int hours = dt.getHours();
-    	    	int minutes = dt.getMinutes();
-    	    	int seconds = dt.getSeconds();
-
-    	    	String cTime = hours+":"+minutes+":"+seconds+"";
+       	
+                Calendar now = Calendar.getInstance();
+                int hours = now.get(Calendar.HOUR_OF_DAY);
+                int minutes = now.get(Calendar.MINUTE);
+                int seconds = now.get(Calendar.SECOND);
+                
+                int day = now.get(Calendar.DAY_OF_MONTH);
+                int month = now.get(Calendar.MONTH);
+                int year = now.get(Calendar.YEAR);
+                Log.d("HOUR : ", hours+":"+ minutes+":"+seconds);
+                Log.d("DOM : ", ""+ day);
+                Log.d("Month : ", ""+ month);
+                Log.d("Year : ", ""+ year);
+   
+    	    	String cTime = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds + "";
+    	    	
+    	    	Log.d("DATE", cTime+"");
 
     	    	//JSON    	    	
     	    	JSONObject entree = new JSONObject();
     	    	try {
 					entree.put("data", result);
-					entree.put("time", dt.toString());
+					entree.put("time", cTime);
 					etudiants.add(entree);
 
 				} catch (JSONException e) {
