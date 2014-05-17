@@ -45,6 +45,7 @@ public class MainActivity extends Activity {
 	private TextView mTextView;
 	private NfcAdapter mNfcAdapter;
 	JSONObject rootObj;
+	int i=0;
 
 	private Button button01;
     private TextView textView01;
@@ -88,6 +89,9 @@ public class MainActivity extends Activity {
 				SendDataTask task = new SendDataTask();
 				task.execute(new JSONObject[] {rootObj});
 				Log.d("#############", "OKKKKK");
+				Toast.makeText(MainActivity.this, "Liste envoyé", Toast.LENGTH_SHORT).show();
+				mTextView.setText(R.string.explanation);
+				i = 0;
 		        
 			}
 		});
@@ -263,7 +267,9 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                mTextView.setText("Read content: " + result);
+            	i++;
+				String j = Integer.toString(i);
+                mTextView.setText("Nombre de présents: " + j);
        	
                 Calendar now = Calendar.getInstance();
                 int hours = now.get(Calendar.HOUR_OF_DAY);

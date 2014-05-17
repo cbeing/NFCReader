@@ -12,14 +12,21 @@
         android:id="@+id/textView_explanation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:text="@string/explanation" />
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView_explanation"
-        android:text="Liste des présents" />
+
+   <Button 
+       android:id="@+id/button1" 
+       android:background="@drawable/buttonshape"
+       android:layout_centerVertical="true"
+       android:layout_centerHorizontal="true"
+       style="@style/SendBT"
+       android:text="Envoyer" >
+   </Button>
+
+    
+
 
     <TextView
         android:id="@+id/textView1"
@@ -29,5 +36,24 @@
         android:layout_below="@+id/button1"
         android:layout_marginTop="24dp"
         android:text="" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="21dp"
+        android:src="@drawable/celestial_being_logo"
+        android:contentDescription="@string/logoCBeing" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="300dip"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/button1"
+        android:layout_alignTop="@+id/textView_explanation"
+        android:contentDescription="@string/logoSLEAM"
+        android:src="@drawable/logo_sleam" />
 
 </RelativeLayout>

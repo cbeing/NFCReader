@@ -3,6 +3,9 @@
 
     <string name="app_name">NFC Reader</string>
     <string name="action_settings">Settings</string>
-    <string name="explanation">explanation</string>
+    <string name="explanation">Aucun étudiant présent</string>
+    <string name="logoCBeing">Logo CBeing</string>
+    <string name="logoSLEAM">Logo SLEAM</string>
+    
 
 </resources>
